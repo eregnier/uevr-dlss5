@@ -56,7 +56,10 @@ copy "%ROOT_DIR%proxy\openvr_api.dll" "%DIST_DIR%\" >nul
 copy "%ROOT_DIR%deps\OptiScaler.dll" "%DIST_DIR%\" >nul
 copy "%ROOT_DIR%deps\OptiScaler.ini" "%DIST_DIR%\" >nul
 copy "%ROOT_DIR%deps\cudart64_12.dll" "%DIST_DIR%\" >nul
+copy "%ROOT_DIR%LICENSE" "%DIST_DIR%\" >nul
 copy "%ROOT_DIR%README.md" "%DIST_DIR%\" >nul
+if not exist "%DIST_DIR%\LICENSES" mkdir "%DIST_DIR%\LICENSES"
+copy "%ROOT_DIR%deps\LICENSES\*" "%DIST_DIR%\LICENSES\" >nul
 
 :: 5. Create ZIP archive
 echo [5/5] Creating ZIP archive...
