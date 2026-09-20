@@ -1,0 +1,42 @@
+@echo off
+setlocal enabledelayedexpansion
+
+echo ======================================================================
+echo  Example: Updating VR-DLSS5 Binaries & Scripts for a Target UEVR Game
+echo ======================================================================
+
+:: Configure your target game directory and UEVR AppData profile here:
+:: Example:
+:: set "TARGET_GAME_DIR=C:\Games\YourGame\Binaries\Win64"
+:: set "TARGET_PROFILE_DIR=%APPDATA%\UnrealVRMod\YourGame-Win64-Shipping"
+
+if "%~1"=="" (
+    echo Usage: update_game_binaries.bat "Path\To\Game\Binaries\Win64" "GameExeStem"
+    echo Example: update_game_binaries.bat "D:\Games\Hogwarts Legacy\Phoenix\Binaries\Win64" "HogwartsLegacy"
+    exit /b 1
+)
+
+set "TARGET_GAME_DIR=%~1"
+set "GAME_STEM=%~2"
+set "DIST_DIR=%~dp0dist\VR-DLSS5-UEVR-Release"
+set "TARGET_PROFILE_DIR=%APPDATA%\UnrealVRMod\%GAME_STEM%"
+
+echo [DEPLOY] Copying OptiScaler.dll and dxgi.dll...
+copy /y "%DIST_DIR%\OptiScaler.dll" "%TARGET_GAME_DIR%\OptiScaler.dll" >nul
+copy /y "%DIST_DIR%\OptiScaler.dll" "%TARGET_GAME_DIR%\dxgi.dll" >nul
+
+echo [DEPLOY] Deploying UEVR Plugin and Lua script...
+if not exist "%TARGET_GAME_DIR%\uevr\plugins" mkdir "%TARGET_GAME_DIR%\uevr\plugins"
+if not exist "%TARGET_GAME_DIR%\uevr\scripts" mkdir "%TARGET_GAME_DIR%\uevr\scripts"
+copy /y "%DIST_DIR%\VRDLSS5_UEVR_Plugin.dll" "%TARGET_GAME_DIR%\uevr\plugins\VRDLSS5_UEVR_Plugin.dll" >nul
+copy /y "%DIST_DIR%\VRDLSS5.lua" "%TARGET_GAME_DIR%\uevr\scripts\VRDLSS5.lua" >nul
+
+if not "%GAME_STEM%"=="" (
+    if not exist "%TARGET_PROFILE_DIR%\plugins" mkdir "%TARGET_PROFILE_DIR%\plugins"
+    if not exist "%TARGET_PROFILE_DIR%\scripts" mkdir "%TARGET_PROFILE_DIR%\scripts"
+    copy /y "%DIST_DIR%\VRDLSS5_UEVR_Plugin.dll" "%TARGET_PROFILE_DIR%\plugins\VRDLSS5_UEVR_Plugin.dll" >nul
+    copy /y "%DIST_DIR%\VRDLSS5.lua" "%TARGET_PROFILE_DIR%\scripts\VRDLSS5.lua" >nul
+)
+
+echo [SUCCESS] Game binaries and profile scripts updated!
+pause

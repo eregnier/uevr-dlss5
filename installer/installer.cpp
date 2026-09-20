@@ -26,8 +26,8 @@
 
 // Version Constants
 #define CURRENT_VERSION_STR L"1.1.0"
-#define UPDATE_CHECK_URL    L"https://raw.githubusercontent.com/eregnier/dlss5-vr/main/VERSION"
-#define GITHUB_RELEASES_URL L"https://github.com/eregnier/dlss5-vr/releases"
+#define UPDATE_CHECK_URL    L"https://raw.githubusercontent.com/eregnier/vrdlss5-uevr/main/VERSION"
+#define GITHUB_RELEASES_URL L"https://github.com/eregnier/vrdlss5-uevr/releases"
 
 // Control IDs
 #define IDC_EDIT_PATH       1001

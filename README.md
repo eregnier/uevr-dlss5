@@ -110,7 +110,7 @@ Pour retirer DLSS 5 d'un jeu :
 
 ### 1. Build Global en Un Clic
 ```cmd
-cd C:\code\vrdlss5-uevr
+cd vrdlss5-uevr
 package_release.bat
 ```
 Ce script compile l'ensemble des modules et génère le dossier ainsi que l'archive :
@@ -120,17 +120,17 @@ Ce script compile l'ensemble des modules et génère le dossier ainsi que l'arch
 ### 2. Compilation Individuelle des Modules
 - **Plugin UEVR** :
   ```cmd
-  cd C:\code\vrdlss5-uevr\plugin
+  cd plugin
   build.bat
   ```
 - **Installateur Graphique** :
   ```cmd
-  cd C:\code\vrdlss5-uevr\installer
+  cd installer
   build.bat
   ```
 - **Dual-Proxy Standalone** :
   ```cmd
-  cd C:\code\vrdlss5-uevr\proxy
+  cd proxy
   build.bat
   ```
 

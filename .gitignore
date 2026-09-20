@@ -4,18 +4,39 @@
 *.lib
 *.pdb
 *.ilk
+*.idb
+*.exe~
+*.dll.tmp
+
+# Executables (compiled binaries belong in GitHub Releases, not source control)
+*.exe
 
 # Visual Studio & IDE
 .vs/
 *.user
 *.suo
 *.sln.docstates
+.vscode/
+.idea/
 
-# Distribution archives
+# Distribution archives & artifacts
 dist/
+*.zip
+*.7z
+*.rar
+*.tar.gz
+
+# Temporary files & logs
+*.log
+*.tmp
+*.bak
+*.dmp
+
+# Local development / user-specific scripts
+update_game_binaries.bat
+cache/
+temp/
+tmp/
 
 # UEVR submodule / external clone
 /UEVR/
-
-# Temporary logs
-*.log
