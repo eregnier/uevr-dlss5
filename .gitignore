@@ -1,0 +1,21 @@
+# Build intermediates
+*.obj
+*.exp
+*.lib
+*.pdb
+*.ilk
+
+# Visual Studio & IDE
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+# Distribution archives
+dist/
+
+# UEVR submodule / external clone
+/UEVR/
+
+# Temporary logs
+*.log
