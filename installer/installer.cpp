@@ -756,23 +756,49 @@ void InspectTarget()
     g_runningProcessName = exeName;
     g_isGameRunning = CheckProcessRunning(exeName);
 
-    // 1. Unreal Engine deep-check: check if game has Binaries\Win64
+    // 1. Unreal Engine deep-check: check if game has Binaries\Win64 or <Project>\Binaries\Win64
     wchar_t ueCheck[MAX_PATH];
     PathCombineW(ueCheck, dir, L"Binaries\\Win64");
     if (PathFileExistsW(ueCheck)) {
         g_targetDir = ueCheck;
         g_isUnrealEngine = true;
         AppendLog(L"[INFO] Unreal Engine detected: Automatically switching target dir to Binaries\\Win64");
+    } else if (wcsstr(dir, L"Binaries\\Win64") != NULL || wcsstr(dir, L"binaries\\win64") != NULL) {
+        g_isUnrealEngine = true;
     } else {
-        // If current exe is already inside Binaries\Win64
-        if (wcsstr(dir, L"Binaries\\Win64") != NULL || wcsstr(dir, L"binaries\\win64") != NULL) {
-            g_isUnrealEngine = true;
-        } else {
-            // Check for Engine folder in parent
+        // Search subdirectories for <Project>\Binaries\Win64 (e.g. Phoenix\Binaries\Win64, NWD\Binaries\Win64)
+        bool foundSub = false;
+        WIN32_FIND_DATAW fd;
+        HANDLE hSub = FindFirstFileW((std::wstring(dir) + L"\\*").c_str(), &fd);
+        if (hSub != INVALID_HANDLE_VALUE) {
+            do {
+                if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && wcscmp(fd.cFileName, L".") != 0 && wcscmp(fd.cFileName, L"..") != 0) {
+                    wchar_t candidate[MAX_PATH];
+                    PathCombineW(candidate, dir, fd.cFileName);
+                    PathCombineW(candidate, candidate, L"Binaries\\Win64");
+                    if (PathFileExistsW(candidate)) {
+                        g_targetDir = candidate;
+                        g_isUnrealEngine = true;
+                        foundSub = true;
+                        AppendLog(L"[INFO] Unreal Engine detected: Automatically switching target dir to " + std::wstring(candidate));
+                        break;
+                    }
+                }
+            } while (FindNextFileW(hSub, &fd));
+            FindClose(hSub);
+        }
+
+        if (!foundSub) {
+            // Check for Engine folder in parent or current
             wchar_t engineCheck[MAX_PATH];
             PathCombineW(engineCheck, dir, L"..\\Engine");
             if (PathFileExistsW(engineCheck)) {
                 g_isUnrealEngine = true;
+            } else {
+                PathCombineW(engineCheck, dir, L"Engine");
+                if (PathFileExistsW(engineCheck)) {
+                    g_isUnrealEngine = true;
+                }
             }
         }
     }
@@ -934,12 +960,19 @@ void DoInstall()
         }
     }
 
-    // Step 1: Ensure uevr/plugins directory exists for UEVR Plugin
+    // Step 1: Ensure uevr/plugins and uevr/scripts directories exist for UEVR Plugin & Lua
     wchar_t uevrPluginsDir[MAX_PATH];
     PathCombineW(uevrPluginsDir, g_targetDir.c_str(), L"uevr\\plugins");
     if (!PathFileExistsW(uevrPluginsDir)) {
         SHCreateDirectoryExW(NULL, uevrPluginsDir, NULL);
         AppendLog(L"[DIR] Created UEVR plugins directory: uevr\\plugins");
+    }
+
+    wchar_t uevrScriptsDir[MAX_PATH];
+    PathCombineW(uevrScriptsDir, g_targetDir.c_str(), L"uevr\\scripts");
+    if (!PathFileExistsW(uevrScriptsDir)) {
+        SHCreateDirectoryExW(NULL, uevrScriptsDir, NULL);
+        AppendLog(L"[DIR] Created UEVR scripts directory: uevr\\scripts");
     }
 
     // Step 2: Copy / Download Components
@@ -954,6 +987,7 @@ void DoInstall()
         { L"VRDLSS5_UEVR_Plugin.dll", L"uevr\\plugins", L"VRDLSS5_UEVR_Plugin.dll", true }, // UEVR in-headset HUD Plugin
         { L"VRDLSS5.lua", L"uevr\\scripts", L"VRDLSS5.lua", false },                        // UEVR in-headset Lua UI Panel
         { L"OptiScaler.dll", L"", L"OptiScaler.dll", true },                                // Pre-SR Multipass Engine
+        { L"OptiScaler.dll", L"", L"dxgi.dll", false },                                     // DXGI Proxy hook
         { L"OptiScaler.dll", L"", L"OptiScaler.asi", false },                               // ASI loader hook fallback
         { L"nvngx.dll_dlssnr.dll", L"", L"nvngx.dll_dlssnr.dll", true },                    // Signature forwarder
         { L"OptiScaler.ini", L"", L"OptiScaler.ini", false },                               // Base configuration
@@ -985,58 +1019,42 @@ void DoInstall()
 
         if (CopyFileW(src.c_str(), dest, FALSE)) {
             AppendLog(L"[COPY] Installed: " + (item.dstSubDir.empty() ? item.dstName : (item.dstSubDir + L"\\" + item.dstName)));
-
-            // If this is the UEVR Plugin, also deploy to UEVR persistent directories
-            if (item.dstName == L"VRDLSS5_UEVR_Plugin.dll") {
-                wchar_t appData[MAX_PATH] = L"";
-                if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, appData))) {
-                    // Game-specific plugin path
-                    std::wstring gameExeStem = g_runningProcessName;
-                    size_t dotPos = gameExeStem.rfind(L'.');
-                    if (dotPos != std::wstring::npos) gameExeStem = gameExeStem.substr(0, dotPos);
-
-                    std::wstring uevrGamePluginDir = std::wstring(appData) + L"\\UnrealVRMod\\" + gameExeStem + L"\\plugins";
-                    SHCreateDirectoryExW(NULL, uevrGamePluginDir.c_str(), NULL);
-                    std::wstring uevrGamePluginDst = uevrGamePluginDir + L"\\VRDLSS5_UEVR_Plugin.dll";
-                    if (CopyFileW(src.c_str(), uevrGamePluginDst.c_str(), FALSE)) {
-                        AppendLog(L"[COPY] Installed to UEVR game plugins: " + uevrGamePluginDst);
-                    }
-
-                    // Global UEVR plugin path
-                    std::wstring uevrGlobalPluginDir = std::wstring(appData) + L"\\UnrealVRMod\\UEVR\\plugins";
-                    SHCreateDirectoryExW(NULL, uevrGlobalPluginDir.c_str(), NULL);
-                    std::wstring uevrGlobalPluginDst = uevrGlobalPluginDir + L"\\VRDLSS5_UEVR_Plugin.dll";
-                    if (CopyFileW(src.c_str(), uevrGlobalPluginDst.c_str(), FALSE)) {
-                        AppendLog(L"[COPY] Installed to UEVR global plugins: " + uevrGlobalPluginDst);
-                    }
-                }
-            }
-
-            // If this is the UEVR Lua script, also deploy to UEVR persistent script directories
-            if (item.dstName == L"VRDLSS5.lua") {
-                wchar_t appData[MAX_PATH] = L"";
-                if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, appData))) {
-                    std::wstring gameExeStem = g_runningProcessName;
-                    size_t dotPos = gameExeStem.rfind(L'.');
-                    if (dotPos != std::wstring::npos) gameExeStem = gameExeStem.substr(0, dotPos);
-
-                    std::wstring uevrGameScriptDir = std::wstring(appData) + L"\\UnrealVRMod\\" + gameExeStem + L"\\scripts";
-                    SHCreateDirectoryExW(NULL, uevrGameScriptDir.c_str(), NULL);
-                    std::wstring uevrGameScriptDst = uevrGameScriptDir + L"\\VRDLSS5.lua";
-                    if (CopyFileW(src.c_str(), uevrGameScriptDst.c_str(), FALSE)) {
-                        AppendLog(L"[COPY] Installed to UEVR game scripts: " + uevrGameScriptDst);
-                    }
-
-                    std::wstring uevrGlobalScriptDir = std::wstring(appData) + L"\\UnrealVRMod\\UEVR\\scripts";
-                    SHCreateDirectoryExW(NULL, uevrGlobalScriptDir.c_str(), NULL);
-                    std::wstring uevrGlobalScriptDst = uevrGlobalScriptDir + L"\\VRDLSS5.lua";
-                    if (CopyFileW(src.c_str(), uevrGlobalScriptDst.c_str(), FALSE)) {
-                        AppendLog(L"[COPY] Installed to UEVR global scripts: " + uevrGlobalScriptDst);
-                    }
-                }
-            }
         } else {
-            AppendLog(L"[ERROR] Failed to copy " + item.dstName + L" (Error " + std::to_wstring(GetLastError()) + L")");
+            AppendLog(L"[WARN] Local copy skipped/failed for " + item.dstName + L" (Error " + std::to_wstring(GetLastError()) + L")");
+        }
+
+        // Deploy UEVR Plugin to game profile
+        if (item.dstName == L"VRDLSS5_UEVR_Plugin.dll") {
+            wchar_t appData[MAX_PATH] = L"";
+            if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, appData))) {
+                std::wstring gameExeStem = g_runningProcessName;
+                size_t dotPos = gameExeStem.rfind(L'.');
+                if (dotPos != std::wstring::npos) gameExeStem = gameExeStem.substr(0, dotPos);
+
+                std::wstring uevrGamePluginDir = std::wstring(appData) + L"\\UnrealVRMod\\" + gameExeStem + L"\\plugins";
+                SHCreateDirectoryExW(NULL, uevrGamePluginDir.c_str(), NULL);
+                std::wstring uevrGamePluginDst = uevrGamePluginDir + L"\\VRDLSS5_UEVR_Plugin.dll";
+                if (CopyFileW(src.c_str(), uevrGamePluginDst.c_str(), FALSE)) {
+                    AppendLog(L"[COPY] Installed to UEVR game plugins: " + uevrGamePluginDst);
+                }
+            }
+        }
+
+        // Deploy UEVR Lua script to game profile
+        if (item.dstName == L"VRDLSS5.lua") {
+            wchar_t appData[MAX_PATH] = L"";
+            if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, appData))) {
+                std::wstring gameExeStem = g_runningProcessName;
+                size_t dotPos = gameExeStem.rfind(L'.');
+                if (dotPos != std::wstring::npos) gameExeStem = gameExeStem.substr(0, dotPos);
+
+                std::wstring uevrGameScriptDir = std::wstring(appData) + L"\\UnrealVRMod\\" + gameExeStem + L"\\scripts";
+                SHCreateDirectoryExW(NULL, uevrGameScriptDir.c_str(), NULL);
+                std::wstring uevrGameScriptDst = uevrGameScriptDir + L"\\VRDLSS5.lua";
+                if (CopyFileW(src.c_str(), uevrGameScriptDst.c_str(), FALSE)) {
+                    AppendLog(L"[COPY] Installed to UEVR game scripts: " + uevrGameScriptDst);
+                }
+            }
         }
     }
 
@@ -1153,6 +1171,25 @@ void DoRestore()
     if (PathFileExistsW(backendDir)) {
         DeleteDirectoryRecursiveW(backendDir);
         AppendLog(L"[CLEAN] Removed OptiScaler/ backend folder");
+    }
+
+    // Clean up game profile in AppData
+    wchar_t appData[MAX_PATH] = L"";
+    if (SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA, NULL, 0, appData))) {
+        std::wstring gameExeStem = g_runningProcessName;
+        size_t dotPos = gameExeStem.rfind(L'.');
+        if (dotPos != std::wstring::npos) gameExeStem = gameExeStem.substr(0, dotPos);
+
+        std::wstring pPlugin = std::wstring(appData) + L"\\UnrealVRMod\\" + gameExeStem + L"\\plugins\\VRDLSS5_UEVR_Plugin.dll";
+        if (PathFileExistsW(pPlugin.c_str())) {
+            DeleteFileW(pPlugin.c_str());
+            AppendLog(L"[CLEAN] Removed game profile plugin: " + pPlugin);
+        }
+        std::wstring pScript = std::wstring(appData) + L"\\UnrealVRMod\\" + gameExeStem + L"\\scripts\\VRDLSS5.lua";
+        if (PathFileExistsW(pScript.c_str())) {
+            DeleteFileW(pScript.c_str());
+            AppendLog(L"[CLEAN] Removed game profile script: " + pScript);
+        }
     }
 
     AppendLog(L"[SUCCESS] Game directory restored to vanilla state!");
