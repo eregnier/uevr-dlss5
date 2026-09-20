@@ -1,141 +1,141 @@
-# DLSS 5 <> UEVR : Neural Reconstruction pour Unreal Engine VR
+# DLSS 5 <> UEVR : Neural Reconstruction for Unreal Engine VR
 
-[![Plateforme: Windows 64-bit](https://img.shields.io/badge/Plateforme-Windows%20x64-blue.svg)](https://github.com/eregnier/uevr-dlss5/releases)
-[![Graphismes: DirectX 12](https://img.shields.io/badge/Graphismes-DirectX%2012-brightgreen.svg)]()
+[![Platform: Windows 64-bit](https://img.shields.io/badge/Platform-Windows%20x64-blue.svg)](https://github.com/eregnier/uevr-dlss5/releases)
+[![Graphics: DirectX 12](https://img.shields.io/badge/Graphics-DirectX%2012-brightgreen.svg)]()
 [![VR: OpenXR / SteamVR](https://img.shields.io/badge/VR-OpenXR%20%7C%20SteamVR-orange.svg)]()
 [![Framework: Praydog UEVR](https://img.shields.io/badge/Framework-Praydog%20UEVR-purple.svg)](https://github.com/praydog/UEVR)
-[![Licence: MIT](https://img.shields.io/badge/Licence-MIT-green.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Pont universel et suite logicielle adaptant **NVIDIA DLSS 5 Neural Reconstruction** (moteur OptiScaler Pre-SR Multipass) pour les jeux Unreal Engine 4 et 5 injectés avec **UEVR (Praydog Universal VR Mod)**, avec intégration complète du menu dans le casque en Réalité Virtuelle (OpenXR et OpenVR).
+Universal bridge and software suite adapting **NVIDIA DLSS 5 Neural Reconstruction** (OptiScaler Pre-SR Multipass engine) for Unreal Engine 4 and 5 games injected with **UEVR (Praydog Universal VR Mod)**, featuring complete in-headset controls in Virtual Reality (OpenXR and SteamVR).
 
 ---
 
-## 🚀 Démarrage Rapide (Pour les Joueurs)
+## 🚀 Quick Start (For Players)
 
 > [!TIP]
-> **Aucune compilation n'est requise !**  
-> Si vous souhaitez simplement jouer, téléchargez l'archive prête à l'emploi dans la section [**Releases GitHub**](https://github.com/eregnier/uevr-dlss5/releases).
+> **No compilation required!**  
+> If you simply want to play, download the ready-to-use distribution archive from the [**GitHub Releases**](https://github.com/eregnier/uevr-dlss5/releases) section.
 
-### 1. Téléchargement & Préparation
-1. Rendez-vous sur les [**Releases du projet**](https://github.com/eregnier/uevr-dlss5/releases) et téléchargez la dernière archive `VR-DLSS5-UEVR-Release.zip`.
-2. Extrayez le contenu de l'archive dans le dossier de votre choix.
-3. Procurez-vous le runtime NVIDIA DLSS 5 (`nvngx_dlssnr.dll`, build 310.8+) via le SDK officiel NVIDIA ou la communauté.
+### 1. Download & Preparation
+1. Head over to the project's [**Releases page**](https://github.com/eregnier/uevr-dlss5/releases) and download the latest `VR-DLSS5-UEVR-Release.zip`.
+2. Extract the archive into a folder of your choice.
+3. Obtain the NVIDIA DLSS 5 runtime (`nvngx_dlssnr.dll`, build 310.8+) via official NVIDIA SDK sources or community mirrors.
 
-### 2. Installation en 1 Clic avec l'Installateur Graphique
-1. Lancez **`VR-DLSS5-UEVR-Installer.exe`** situé dans le dossier extrait.
-2. **Sélectionnez le jeu** :
-   - Cliquez sur **Parcourir...** (ou glissez-déposez l'exécutable du jeu dans la fenêtre).
-   - *Détection intelligente* : Si vous sélectionnez le launcher à la racine du jeu, l'installateur trouve automatiquement le véritable exécutable Unreal Engine dans `Binaries\Win64`.
-3. **Sélectionnez votre modèle DLSS 5 (`nvngx_dlssnr.dll`)** :
-   - Cliquez sur **Sélectionner fichier...** et pointez vers votre fichier `nvngx_dlssnr.dll`.
-   - L'installateur vérifie automatiquement la signature cryptographique (SHA-256) et mémorise l'emplacement du fichier pour vos futures installations.
-4. **Cliquez sur `Installer / Mettre à jour DLSS 5`** :
-   - L'installateur s'occupe de tout : injection du runtime `OptiScaler.dll` dans le dossier du jeu, configuration VR sur-mesure (`OptiScaler.ini`), et déploiement du plugin UEVR (`VRDLSS5_UEVR_Plugin.dll`) ainsi que de l'interface en jeu (`VRDLSS5.lua`).
-   - **Isolation stricte par jeu** : Le plugin est déployé spécifiquement dans le profil du jeu (`%APPDATA%\UnrealVRMod\<Jeu>\`), évitant ainsi de polluer vos autres jeux UEVR.
+### 2. One-Click Installation with GUI Installer
+1. Launch **`VR-DLSS5-UEVR-Installer.exe`** located inside the extracted folder.
+2. **Select your game**:
+   - Click **Browse...** (or drag & drop your game's executable into the window).
+   - *Smart Detection*: If you select the root game launcher, the installer automatically locates the true Unreal Engine binary inside `Binaries\Win64`.
+3. **Select your DLSS 5 model (`nvngx_dlssnr.dll`)**:
+   - Click **Select file...** and point to your `nvngx_dlssnr.dll`.
+   - The installer verifies its SHA-256 hash automatically and remembers this location for future installs.
+4. **Click `Install / Update DLSS 5`**:
+   - The installer handles everything: injecting `OptiScaler.dll` into the game directory, writing a VR-tuned `OptiScaler.ini`, and deploying both the native C++ plugin (`VRDLSS5_UEVR_Plugin.dll`) and Lua in-game script (`VRDLSS5.lua`).
+   - **Strict Per-Game Isolation**: The plugin is installed specifically to the game's dedicated profile (`%APPDATA%\UnrealVRMod\<Game>\`), leaving your other UEVR games completely untouched.
 
-### 3. Lancement et Activation en Réalité Virtuelle
-1. Démarrez votre casque VR (Meta Quest Link / Virtual Desktop, Valve Index, Bigscreen Beyond, HTC Vive, etc.).
-2. Lancez le jeu via Steam / Epic Games / etc.
-3. Injectez UEVR avec `UEVRInjector.exe` comme d'habitude.
-4. Une fois dans le jeu :
-   - Ouvrez le menu UEVR en appuyant sur **`L3 + R3`** (clic simultané des deux sticks manette) ou sur la touche **`Inser` / `Insert`** du clavier.
-   - Cliquez sur l'onglet **`DLSS 5 Neural Reconstruction`**.
-   - Cochez la case **`Enable Neural Engine`** pour activer la reconstruction neuronale en temps réel !
+### 3. Launch & Enable in Virtual Reality
+1. Start your VR headset (Meta Quest Link / Virtual Desktop, Valve Index, Bigscreen Beyond, HTC Vive, etc.).
+2. Launch the game through Steam, Epic Games, etc.
+3. Inject UEVR using `UEVRInjector.exe` as usual.
+4. Once in-game:
+   - Open the UEVR menu by pressing **`L3 + R3`** (simultaneous click of both controller thumbsticks) or the **`Insert`** key on your keyboard.
+   - Select the **`DLSS 5 Neural Reconstruction`** tab.
+   - Check **`Enable Neural Engine`** to activate neural reconstruction in real time!
 
 ---
 
-## 💡 Principes & Architecture Technique
+## 💡 Architecture & Technical Principles
 
-### 1. Pourquoi le mode Pre-SR Multipass est indispensable en VR ?
-- **L'approche naïve** (Post-SR) applique le modèle neuronal DLSS 5 sur l'image stéréo 4K déjà upscalée (~29.5 mégapixels pour les deux yeux). Cette passe coûte 8 à 15 ms sur GPU, ce qui détruit le budget de temps de trame VR (8.3 ms à 120 Hz, 11.1 ms à 90 Hz, 13.8 ms à 72 Hz) et provoque un décrochage immédiat en reprojection.
-- **L'architecture Pre-SR Multipass** inverse le pipeline : DLSS 5 est exécuté directement sur le buffer de couleur actif à l'échelle de rendu interne (`WorkingScale = 0.75x` ou `0.66x`), traitant seulement **~4.15 mégapixels** (~0.7 à 1.6 ms sur RTX 4090/5090). L'upscaler DLSS Super Resolution prend ensuite le relais pour agrandir l'image enrichie vers la résolution cible du casque.
+### 1. Why Pre-SR Multipass is Essential for VR
+- **The Naive Approach (Post-SR)** runs the DLSS 5 neural model on the already upscaled 4K stereo image (~29.5 megapixels across both eyes). This pass consumes 8 to 15 ms of GPU time, completely shattering the VR frame budget (8.3 ms @ 120 Hz, 11.1 ms @ 90 Hz, 13.8 ms @ 72 Hz) and triggering severe reprojection.
+- **The Pre-SR Multipass Architecture** flips the pipeline: DLSS 5 is executed directly on the internal render resolution color buffer (`WorkingScale = 0.75x` or `0.66x`), evaluating only **~4.15 megapixels** (~0.7 to 1.6 ms on an RTX 4090/5090). The DLSS Super Resolution upscaler then takes over to enlarge the reconstructed image to headset target resolution.
 
-### 2. Préservation Intégrale du HUD en Jeu
-Dans UEVR, l'interface utilisateur Unreal Engine (Slate / UMG : réticule, boussole, santé, inventaires) est interceptée dans une texture séparée (`ui_target`) puis projetée en 3D dans le casque. Comme cette composition s'effectue **après** le traitement DLSS 5, le HUD conserve une netteté vectorielle native 1:1, **sans aucun flou, ghosting ni déformation**.
+### 2. Full HUD & UI Preservation
+In UEVR, the Unreal Engine user interface (Slate / UMG: crosshair, health, compass, inventory) is captured into a separate texture target (`ui_target`) and composited in 3D space. Because this composition occurs **after** DLSS 5 processing, the HUD retains crisp 1:1 vector sharpness **with zero ghosting, blurring, or warping**.
 
-### 3. Moteur Neuronal Inactif par Défaut
+### 3. Neural Engine Disabled by Default
 > [!IMPORTANT]
-> **Le moteur neuronal DLSS 5 est volontairement désactivé par défaut (`Enabled = false`) lors de l'installation.**  
-> Cela garantit que le jeu se lance avec 100 % de ses performances d'origine sans charge GPU imprévue. Vous l'activez à la demande dans le casque via le menu UEVR.
+> **The DLSS 5 neural engine is intentionally disabled (`Enabled = false`) upon installation.**  
+> This guarantees the game launches with 100% stock performance without unexpected GPU load. You enable it on-demand inside the headset via the UEVR menu.
 
-### 4. Compatibilité DirectX 12 / DirectX 11
-- Le modèle neuronal NVIDIA DLSS 5 (`nvngx_dlssnr.dll`) requiert l'architecture **DirectX 12** ou **Vulkan** (calcul tensoriel asynchrone).
-- Pour les jeux Unreal Engine qui se lancent par défaut en DirectX 11, ajoutez simplement l'argument **`-dx12`** ou **`-d3d12`** dans les options de lancement Steam du jeu pour basculer sur le moteur de rendu DirectX 12.
+### 4. DirectX 12 / DirectX 11 Compatibility
+- The NVIDIA DLSS 5 runtime (`nvngx_dlssnr.dll`) requires **DirectX 12** or **Vulkan** (asynchronous tensor math).
+- For Unreal Engine games that boot in DirectX 11 by default, simply append **`-dx12`** or **`-d3d12`** to your Steam Launch Options to switch the game engine to DirectX 12.
 
 ---
 
-## 🎮 Contrôles & Raccourcis en Jeu
+## 🎮 In-Game Controls & Shortcuts
 
-| Action | Raccourci Manette / VR | Raccourci Clavier |
+| Action | Controller / VR Shortcut | Keyboard Shortcut |
 | :--- | :--- | :--- |
-| **Ouvrir le menu UEVR** | **`L3 + R3`** (Clic simultané des deux sticks) | **`Inser` / `Insert`** |
-| **Accéder aux réglages DLSS 5** | Onglet **`DLSS 5 Neural Reconstruction`** | Même onglet |
-| **Ouvrir l'overlay autonome (Direct)** | - | **`F6`** ou **`Début` / `Home`** |
-| **Fermer l'overlay autonome** | - | **`Échap` / `Escape`** ou **`F6`** |
-| **Bascule rapide Ray Reconstruction** | - | **`F8`** |
+| **Open UEVR Menu** | **`L3 + R3`** (Click both sticks simultaneously) | **`Insert`** |
+| **Access DLSS 5 Settings** | Tab **`DLSS 5 Neural Reconstruction`** | Same tab |
+| **Open Standalone Overlay (Direct)** | - | **`F6`** or **`Home`** |
+| **Close Standalone Overlay** | - | **`Escape`** or **`F6`** |
+| **Toggle Ray Reconstruction** | - | **`F8`** |
 
 > [!NOTE]
-> Aucun hook de manette personnalisé n'est actif en arrière-plan. Le plugin s'appuie à 100 % sur l'interception native de UEVR (`L3 + R3`), garantissant **0 % de surcharge CPU** sur le thread de rendu.
+> No background gamepad polling hooks are registered. The plugin relies 100% on UEVR's native input interception (`L3 + R3`), guaranteeing **0% CPU rendering thread overhead**.
 
 ---
 
-## ⚙️ Paramètres du Menu DLSS 5
+## ⚙️ DLSS 5 Menu Parameters
 
-| Section | Paramètre | Valeur par défaut | Description & Recommandation |
+| Section | Parameter | Default Value | Description & Recommendation |
 | :--- | :--- | :--- | :--- |
-| **En-tête** | **Enable Neural Engine** | `Désactivé` | Active ou désactive le traitement neuronal DLSS 5 en temps réel. |
-| **Général** | **VR WorkingScale** | `0.75x` | Échelle d'inférence neuronale. Réduire à `0.66x` ou `0.50x` sur les scènes lourdes ou les casques à haute fréquence (90/120 Hz). |
-| **Général** | **Run Before SR** | `Activé` | **Indispensable en VR.** Applique DLSS 5 avant l'upscaling pour diviser la surface de calcul par 4. |
-| **Général** | **ResidualAcrossRR** | `Désactivé` | Préservation du résidu avec Ray Reconstruction. Laisser désactivé sauf si le jeu utilise activement le Ray Reconstruction. |
-| **Général** | **AI Model Preset** | `2 - Performance` | Préréglage du réseau. Le mode 2 (Performance) offre le meilleur compromis netteté / temps de calcul en VR. |
-| **Général** | **DLSS 5 Style** | `0 - Standard` | Style de rendu (0: Standard, 1: Naturel, 2: Cinématique). |
-| **Général** | **DLSS 5 Intensity** | `1.00x` | Intensité de la reconstruction des micro-détails (0.00x à 2.00x). |
-| **Avancé** | **Structure Décor** | `1.00x` | Accentuation des surfaces et éléments géométriques de l'environnement. |
-| **Avancé** | **Tonalité Ombres** | `0.00x` | Équilibrage des zones d'ombres et des reflets spéculaires. |
-| **Avancé** | **Masque Auto** | `Activé` | Masquage sémantique automatique des personnages pour éviter toute distorsion faciale. |
-| **Avancé** | **Structure Peau** | `-1.00x` | Adoucissement et préservation des textures de peau (-1.00 = automatique). |
-| **Avancé** | **Passes IA** | `1 - Simple Passe`| Nombre de passes en chaîne. Laisser sur 1 en VR pour préserver le taux de rafraîchissement. |
-| **Sécurité** | **Dynamic VR Frame Guard** | `Activé` | Surveille le budget de trame GPU en continu. Si le temps dépasse la limite VR, l'échelle est automatiquement ajustée pour maintenir la fluidité. |
+| **Header** | **Enable Neural Engine** | `Disabled` | Toggles real-time DLSS 5 neural reconstruction on or off. |
+| **General** | **VR WorkingScale** | `0.75x` | Neural inference resolution scale. Lower to `0.66x` or `0.50x` in demanding titles or on 90/120 Hz displays. |
+| **General** | **Run Before SR** | `Enabled` | **Required for VR.** Runs DLSS 5 prior to upscaling, reducing compute area by 4x. |
+| **General** | **ResidualAcrossRR** | `Disabled` | Preserves residual high-frequency data across Ray Reconstruction passes. Keep off unless active Ray Reconstruction is in use. |
+| **General** | **AI Model Preset** | `2 - Performance` | Neural network preset. Mode 2 (Performance) yields the ideal sharpness-to-compute ratio in VR. |
+| **General** | **DLSS 5 Style** | `0 - Standard` | Rendering style aesthetic (0: Standard, 1: Natural, 2: Cinematic). |
+| **General** | **DLSS 5 Intensity** | `1.00x` | Micro-detail reconstruction intensity (0.00x to 2.00x). |
+| **Advanced**| **Structure Décor** | `1.00x` | Accentuation of environment surfaces and geometric boundaries. |
+| **Advanced**| **Tonalité Ombres** | `0.00x` | Fine-tuning of deep shadow tonal contrast and specular highlights. |
+| **Advanced**| **Auto Face Mask** | `Enabled` | Semantic facial masking preventing skin deformation or facial artifacts. |
+| **Advanced**| **Structure Peau** | `-1.00x` | Softening and organic skin texture preservation (-1.00 = automatic). |
+| **Advanced**| **AI Passes** | `1 - Single Pass`| Sequential inference passes. Keep at 1 in VR to protect frametimes. |
+| **Safety**  | **Dynamic VR Frame Guard** | `Enabled` | Real-time GPU frametime monitor. Dynamically scales resolution if frame delivery approaches deadline. |
 
 ---
 
-## 🔄 Désinstallation & Restauration
+## 🔄 Uninstallation & Restoration
 
-Pour retirer DLSS 5 d'un jeu sans laisser de traces :
-1. Lancez **`VR-DLSS5-UEVR-Installer.exe`**.
-2. Sélectionnez l'exécutable du jeu.
-3. Cliquez sur **`Restaurer / Restore Original`**.  
-   L'installateur supprime les DLLs injectées (`OptiScaler.dll`, `VRDLSS5_UEVR_Plugin.dll`, `VRDLSS5.lua`, etc.) et restaure l'état d'origine du jeu.
+To remove DLSS 5 from a game cleanly:
+1. Launch **`VR-DLSS5-UEVR-Installer.exe`**.
+2. Select the game's executable.
+3. Click **`Restore Original`**.  
+   The installer removes all injected DLLs (`OptiScaler.dll`, `VRDLSS5_UEVR_Plugin.dll`, `VRDLSS5.lua`, etc.) and restores the game to its stock state.
 
 ---
 
-## 🛠️ Compilation Depuis les Sources (Pour Développeurs)
+## 🛠️ Building from Source (For Developers)
 
-### Prérequis
+### Prerequisites
 - Windows 10/11 x64
-- Visual Studio 2022 avec les composants C++ (MSVC `cl.exe` v143+ avec support C++20).
+- Visual Studio 2022 with C++ Desktop tools (MSVC `cl.exe` v143+ with C++20 support).
 
-### Build Global en Un Clic
+### One-Click Global Build
 ```cmd
 cd uevr-dlss5
 package_release.bat
 ```
-Ce script compile l'ensemble des modules et génère automatiquement l'archive de distribution prête à être déployée :
+This script compiles all modules and automatically produces the distribution folder and archive:
 - `dist/VR-DLSS5-UEVR-Release/`
 - `dist/VR-DLSS5-UEVR-Release.zip`
 
-### Compilation Individuelle des Modules
-- **Plugin UEVR** :
+### Individual Module Compilation
+- **UEVR Plugin**:
   ```cmd
   cd plugin
   build.bat
   ```
-- **Installateur Graphique** :
+- **GUI Installer**:
   ```cmd
   cd installer
   build.bat
   ```
-- **Dual-Proxy Standalone** :
+- **Standalone Dual-Proxy**:
   ```cmd
   cd proxy
   build.bat
@@ -143,27 +143,27 @@ Ce script compile l'ensemble des modules et génère automatiquement l'archive d
 
 ---
 
-## 📂 Organisation du Dépôt
+## 📂 Repository Layout
 
 ```
 uevr-dlss5/
-├── installer/             # Installateur Win32 GUI autonome (installer.cpp, build.bat)
-├── plugin/                # Plugin C++ UEVR (VRDLSS5_Plugin.cpp, build.bat)
-├── scripts/               # Script Lua pour l'interface native UEVR (VRDLSS5.lua)
-├── proxy/                 # Dual-proxy optionnel (DXGI + OpenVR Overlay)
-├── deps/                  # Moteur OptiScaler Pre-SR, licences tierces et OptiScaler.ini
-├── dist/                  # Packages de release générés par package_release.bat
-├── doc/                   # Documentation technique détaillée d'architecture
-├── package_release.bat    # Script de build et packaging automatisé
-├── LICENSE                # Licence MIT + attributions tierces
-├── VERSION                # Fichier de version du projet
-└── README.md              # Documentation principale
+├── installer/             # Standalone Win32 GUI installer (installer.cpp, build.bat)
+├── plugin/                # Native UEVR C++ plugin (VRDLSS5_Plugin.cpp, build.bat)
+├── scripts/               # Lua script for native UEVR UI integration (VRDLSS5.lua)
+├── proxy/                 # Optional dual-proxy (DXGI + OpenVR Overlay)
+├── deps/                  # Pre-SR OptiScaler runtime, third-party licenses, VR config
+├── dist/                  # Output packages generated by package_release.bat
+├── doc/                   # Detailed architectural and engineering documentation
+├── package_release.bat    # Automated compilation and packaging script
+├── LICENSE                # MIT License + third-party attribution notices
+├── VERSION                # Semantic version tag file
+└── README.md              # Main documentation
 ```
 
 ---
 
-## ⚖️ Mentions Légales & Remerciements
-- Ce projet est un mod indépendant sous licence MIT et n'est pas affilié à NVIDIA, Epic Games ou Valve Corporation.
-- Le runtime NVIDIA Neural Rendering (`nvngx_dlssnr.dll`) est la propriété exclusive de NVIDIA Corporation et n'est pas redistribué par ce projet. L'utilisateur doit se le procurer par ses propres moyens selon les termes de NVIDIA.
-- **Praydog UEVR** est développé par [praydog](https://github.com/praydog/UEVR) sous licence MIT.
-- **OptiScaler** est développé par les [contributeurs OptiScaler](https://github.com/cdozdil/OptiScaler) et le fork DLSS-NR Pre-SR par [wilsjo2](https://github.com/wilsjo2/OptiScaler-DLSSNR-PreSR-Multipass) sous licence GPL-3.0.
+## ⚖️ Legal & Acknowledgments
+- This project is an independent open-source modification under the MIT License and is not affiliated with NVIDIA Corporation, Epic Games, or Valve Corporation.
+- The NVIDIA Neural Rendering runtime (`nvngx_dlssnr.dll`) is the intellectual property of NVIDIA Corporation and is not redistributed with this project. Users must obtain it independently under NVIDIA's licensing terms.
+- **Praydog UEVR** is developed by [praydog](https://github.com/praydog/UEVR) under the MIT License.
+- **OptiScaler** is developed by [OptiScaler contributors](https://github.com/cdozdil/OptiScaler) and the DLSS-NR Pre-SR fork by [wilsjo2](https://github.com/wilsjo2/OptiScaler-DLSSNR-PreSR-Multipass) under the GPL-3.0 License.
